@@ -1,6 +1,6 @@
 # Astravox
 
-A vocal processing suite for VCV Rack 2, focused on the vocoder niche.
+A vocal processing suite for VCV Rack 2, focused on spectral processing and traditional vocoding.
 
 **Developer:** Jack Arky
 **License:** GPL-3.0-only
@@ -51,7 +51,7 @@ make install    # installs to your Rack user folder
 
 ## License
 
-Copyright (C) 2025 Jack Arky
+Copyright (C) 2026 Jack Arky
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
