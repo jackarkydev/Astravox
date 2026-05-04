@@ -22,9 +22,6 @@ jobs:
           - os: macos-latest
             arch: mac-arm64
             sdk_arch: mac-arm64
-          - os: macos-13
-            arch: mac-x64
-            sdk_arch: mac-x64
           - os: windows-latest
             arch: win-x64
             sdk_arch: win-x64
