@@ -43,6 +43,7 @@ Requires the [VCV Rack 2 SDK](https://vcvrack.com/manual/Building).
 ```bash
 git clone https://github.com/JackArkyDev/Astravox.git
 cd Astravox
+export RACK_DIR=/path/to/Rack-SDK
 make
 make install    # installs to your Rack user folder
 ```
