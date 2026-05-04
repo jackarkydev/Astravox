@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+
+# Build artifacts
+build/
+dist/
+dep/
+plugin.dylib
+plugin.dll
+plugin.so
+
+# Rack SDK (local, not committed)
+Rack-SDK/

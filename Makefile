@@ -1,8 +1,9 @@
 # Astravox — VCV Rack Plugin
 # Vocal processing suite: Vocoder + Expander
 #
-# RACK_DIR points to the extracted Rack SDK (absolute path for out-of-tree builds)
-RACK_DIR ?= /Users/jackarky/Rack-SDK
+# RACK_DIR points to the extracted Rack SDK — set via environment or command line:
+#   make RACK_DIR=/path/to/Rack-SDK
+RACK_DIR ?= ../Rack-SDK
 
 # FLAGS will be passed to both the C and C++ compiler
 FLAGS +=
