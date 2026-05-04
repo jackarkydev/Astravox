@@ -38,7 +38,7 @@ jobs:
 
       - name: Build plugin
         shell: bash
-        run: make dist RACK_DIR=${{ github.workspace }}/Rack-SDK
+        run: make dist RACK_DIR="$GITHUB_WORKSPACE/Rack-SDK"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
