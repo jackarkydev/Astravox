@@ -512,11 +512,12 @@ struct Vocoder : Module {
             hfFilter.process(programAmped, hfCutoff, 0.f, args.sampleRate);
             audioOut += hfFilter.hp(programAmped, 1.f) * 0.25f * vcaLevel * volume;
         }
-        if (inputs[VCA_CV_INPUT].isConnected())
-            audioOut *= clamp(1.f + inputs[VCA_CV_INPUT].getVoltage() / 5.f, 0.f, 1.f);
-        outputs[VCA_OUTPUT].setVoltage(audioOut);
-        outputs[EVEN_OUTPUT].setVoltage(clamp(evenSum * 0.1f * vcaLevel * volume, -12.f, 12.f));
-        outputs[ODD_OUTPUT].setVoltage( clamp(oddSum  * 0.1f * vcaLevel * volume, -12.f, 12.f));
+        float vcaCv = inputs[VCA_CV_INPUT].isConnected()
+            ? clamp(inputs[VCA_CV_INPUT].getVoltage() / 10.f, 0.f, 1.f)
+            : 1.f;
+        outputs[VCA_OUTPUT].setVoltage(audioOut * vcaCv);
+        outputs[EVEN_OUTPUT].setVoltage(clamp(evenSum * 0.1f * vcaLevel * volume * vcaCv, -12.f, 12.f));
+        outputs[ODD_OUTPUT].setVoltage( clamp(oddSum  * 0.1f * vcaLevel * volume * vcaCv, -12.f, 12.f));
     }
 
     json_t* dataToJson() override {

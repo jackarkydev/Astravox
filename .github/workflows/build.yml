@@ -7,80 +7,59 @@ on:
   workflow_dispatch:
 
 env:
-  RACK_PLUGIN_TOOLCHAIN_DIR: /home/build/rack-plugin-toolchain
   RACK_SDK_VERSION: 2.6.6
-
-defaults:
-  run:
-    shell: bash
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  # Linux and Windows: cross-compile inside the rack-plugin-toolchain Docker
-  # container. This matches the local development workflow exactly and avoids
-  # CRT mismatch issues from native Windows builds.
-  build-win-lin:
-    name: ${{ matrix.platform }}
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/qno/rack-plugin-toolchain-win-linux
-      options: --user root
+  build:
     strategy:
       fail-fast: false
       matrix:
-        platform: [win-x64, lin-x64]
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build plugin
-        run: |
-          export PLUGIN_DIR=$GITHUB_WORKSPACE
-          pushd ${{ env.RACK_PLUGIN_TOOLCHAIN_DIR }}
-          make plugin-build-${{ matrix.platform }}
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: plugin-${{ matrix.platform }}
-          path: ${{ env.RACK_PLUGIN_TOOLCHAIN_DIR }}/plugin-build/*.vcvplugin
+        include:
+          - os: ubuntu-latest
+            arch: lin-x64
+            sdk_arch: lin-x64
+          - os: macos-latest
+            arch: mac-arm64
+            sdk_arch: mac-arm64
+          - os: windows-latest
+            arch: win-x64
+            sdk_arch: win-x64
 
-  # macOS: build on macos-latest (arm64 runner). The arm64 build is native;
-  # the x64 build uses CROSS_COMPILE with the x64 Rack SDK. Per-arch SDKs are
-  # used because vcvrack.com doesn't ship a universal SDK for pinned versions.
-  build-mac:
-    name: mac-${{ matrix.platform }}
-    runs-on: macos-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [x64, arm64]
+    runs-on: ${{ matrix.os }}
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Download Rack SDK
+        shell: bash
         run: |
-          curl -fsSL "https://vcvrack.com/downloads/Rack-SDK-${{ env.RACK_SDK_VERSION }}-mac-${{ matrix.platform }}.zip" -o rack-sdk.zip
+          curl -fsSL "https://vcvrack.com/downloads/Rack-SDK-${{ env.RACK_SDK_VERSION }}-${{ matrix.sdk_arch }}.zip" -o rack-sdk.zip
           unzip rack-sdk.zip
+
       - name: Build plugin
-        run: |
-          export RACK_DIR="$GITHUB_WORKSPACE/Rack-SDK"
-          if [ "${{ matrix.platform }}" = "x64" ]; then
-            export CROSS_COMPILE=x86_64-apple-darwin
-          fi
-          make dist
+        shell: bash
+        run: make dist RACK_DIR="$GITHUB_WORKSPACE/Rack-SDK"
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: plugin-mac-${{ matrix.platform }}
+          name: plugin-${{ matrix.arch }}
           path: dist/*.vcvplugin
 
   release:
-    needs: [build-win-lin, build-mac]
+    needs: build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     permissions:
       contents: write
+
     steps:
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
           merge-multiple: true
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
