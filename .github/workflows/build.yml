@@ -7,77 +7,77 @@ on:
   workflow_dispatch:
 
 env:
+  RACK_PLUGIN_TOOLCHAIN_DIR: /home/build/rack-plugin-toolchain
   RACK_SDK_VERSION: 2.6.6
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
-  build:
+  # Linux and Windows: cross-compile inside the rack-plugin-toolchain Docker
+  # container. This matches the local development workflow exactly and avoids
+  # CRT mismatch issues from native Windows builds.
+  build-win-lin:
+    name: ${{ matrix.platform }}
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/qno/rack-plugin-toolchain-win-linux
+      options: --user root
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: ubuntu-latest
-            arch: lin-x64
-            sdk_arch: lin-x64
-          - os: macos-latest
-            arch: mac-arm64
-            sdk_arch: mac-arm64
-          - os: windows-latest
-            arch: win-x64
-            sdk_arch: win-x64
-
-    runs-on: ${{ matrix.os }}
-
+        platform: [win-x64, lin-x64]
     steps:
       - uses: actions/checkout@v4
-
-      # Use MSYS2 MINGW64 on Windows so the plugin links against msvcrt.dll
-      # (legacy MSVC CRT), matching the runtime VCV Rack itself ships.
-      # Git Bash's MinGW on GitHub runners targets UCRT, which causes a
-      # CRT mismatch and crash when Rack instantiates the module.
-      - name: Setup MSYS2 (Windows)
-        if: runner.os == 'Windows'
-        uses: msys2/setup-msys2@v2
-        with:
-          msystem: MINGW64
-          update: false
-          install: make mingw-w64-x86_64-gcc mingw-w64-x86_64-zstd
-
-      - name: Download Rack SDK
-        shell: bash
+      - name: Build plugin
         run: |
-          curl -fsSL "https://vcvrack.com/downloads/Rack-SDK-${{ env.RACK_SDK_VERSION }}-${{ matrix.sdk_arch }}.zip" -o rack-sdk.zip
-          unzip rack-sdk.zip
-
-      - name: Build plugin (Unix)
-        if: runner.os != 'Windows'
-        shell: bash
-        run: make dist RACK_DIR="$GITHUB_WORKSPACE/Rack-SDK"
-
-      - name: Build plugin (Windows)
-        if: runner.os == 'Windows'
-        shell: msys2 {0}
-        run: make dist RACK_DIR="$(cygpath -u "$GITHUB_WORKSPACE")/Rack-SDK"
-
+          export PLUGIN_DIR=$GITHUB_WORKSPACE
+          pushd ${{ env.RACK_PLUGIN_TOOLCHAIN_DIR }}
+          make plugin-build-${{ matrix.platform }}
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: plugin-${{ matrix.arch }}
+          name: plugin-${{ matrix.platform }}
+          path: ${{ env.RACK_PLUGIN_TOOLCHAIN_DIR }}/plugin-build/*.vcvplugin
+
+  # macOS: build natively on macos-latest (arm64 runner), cross-compiling for
+  # both architectures using the universal Rack SDK.
+  build-mac:
+    name: mac-${{ matrix.platform }}
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [x64, arm64]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download Rack SDK
+        run: |
+          curl -fsSL "https://vcvrack.com/downloads/Rack-SDK-${{ env.RACK_SDK_VERSION }}-mac-x64+arm64.zip" -o rack-sdk.zip
+          unzip rack-sdk.zip
+      - name: Build plugin
+        run: |
+          export RACK_DIR="$GITHUB_WORKSPACE/Rack-SDK"
+          export CROSS_COMPILE=${{ matrix.platform == 'x64' && 'x86_64-apple-darwin' || 'arm64-apple-darwin' }}
+          make dist
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-mac-${{ matrix.platform }}
           path: dist/*.vcvplugin
 
   release:
-    needs: build
+    needs: [build-win-lin, build-mac]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     permissions:
       contents: write
-
     steps:
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
           merge-multiple: true
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
