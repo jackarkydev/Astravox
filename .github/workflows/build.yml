@@ -31,15 +31,33 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Use MSYS2 MINGW64 on Windows so the plugin links against msvcrt.dll
+      # (legacy MSVC CRT), matching the runtime VCV Rack itself ships.
+      # Git Bash's MinGW on GitHub runners targets UCRT, which causes a
+      # CRT mismatch and crash when Rack instantiates the module.
+      - name: Setup MSYS2 (Windows)
+        if: runner.os == 'Windows'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: false
+          install: make mingw-w64-x86_64-gcc mingw-w64-x86_64-zstd
+
       - name: Download Rack SDK
         shell: bash
         run: |
           curl -fsSL "https://vcvrack.com/downloads/Rack-SDK-${{ env.RACK_SDK_VERSION }}-${{ matrix.sdk_arch }}.zip" -o rack-sdk.zip
           unzip rack-sdk.zip
 
-      - name: Build plugin
+      - name: Build plugin (Unix)
+        if: runner.os != 'Windows'
         shell: bash
         run: make dist RACK_DIR="$GITHUB_WORKSPACE/Rack-SDK"
+
+      - name: Build plugin (Windows)
+        if: runner.os == 'Windows'
+        shell: msys2 {0}
+        run: make dist RACK_DIR="$(cygpath -u "$GITHUB_WORKSPACE")/Rack-SDK"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
