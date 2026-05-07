@@ -22,6 +22,9 @@ jobs:
           - os: macos-latest
             arch: mac-arm64
             sdk_arch: mac-arm64
+          - os: macos-latest
+            arch: mac-x64
+            sdk_arch: mac-x64
           - os: windows-latest
             arch: win-x64
             sdk_arch: win-x64
@@ -39,7 +42,11 @@ jobs:
 
       - name: Build plugin
         shell: bash
-        run: make dist RACK_DIR="$GITHUB_WORKSPACE/Rack-SDK"
+        run: |
+          if [ "${{ matrix.arch }}" = "mac-x64" ]; then
+            export CROSS_COMPILE=x86_64-apple-darwin
+          fi
+          make dist RACK_DIR="$GITHUB_WORKSPACE/Rack-SDK"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
