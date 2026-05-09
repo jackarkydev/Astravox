@@ -928,13 +928,6 @@ void VocoderPanelDraw::draw(const DrawArgs& args) {
             nvgText(vg, x * PX, y * PX, s, nullptr);
         };
 
-        auto drawBadge = [&](float x, float y, float w, float h, float r) {
-            nvgBeginPath(vg);
-            nvgRoundedRect(vg, x * PX, y * PX, w * PX, h * PX, r * PX);
-            nvgFillColor(vg, BG);
-            nvgFill(vg);
-        };
-
         auto drawBox = [&](float x, float y, float w, float h, float r) {
             nvgBeginPath(vg);
             nvgRoundedRect(vg, x * PX, y * PX, w * PX, h * PX, r * PX);
@@ -943,15 +936,8 @@ void VocoderPanelDraw::draw(const DrawArgs& args) {
             nvgStroke(vg);
         };
 
-        // Section label badge fills (drawn first, under box borders)
-        drawBadge( 75.1f, 85.9f,  7.7f, 2.4f, 0.5f);  // FILTER
-        drawBadge(105.6f, 85.9f,  4.6f, 2.4f, 0.5f);  // LFO
-        drawBadge( 18.6f, 96.6f,  9.3f, 2.4f, 0.5f);  // TRIGGERS
-
-        // Section divider boxes (drawn over badge fills, under text)
-        // FILTER and LFO boxes already exist in panel SVG — not redrawn here
-        drawBox(185.0f,  44.7f,  26.4f, 23.2f, 1.5f);  // FREEZE
-        drawBox(  2.1f,  96.3f,  26.0f, 25.5f, 1.5f);  // TRIGGERS
+        // Section divider boxes (drawn over SVG, under text)
+        // FILTER, LFO, TRIGGERS, and FREEZE boxes and badge fills are now in panel SVG
         drawBox(110.3f,  100.2f,  59.9f, 21.6f, 1.5f);  // patchbay inputs
 
         // Knob dot markers
@@ -1011,13 +997,13 @@ void VocoderPanelDraw::draw(const DrawArgs& args) {
         }
 
         // Section badge labels
-        txt( 24.21f,  18.26f, "VCO",      2.12f, WH, MID);
-        txt(207.84f,  18.26f, "VCA",      2.12f, WH, MID);
-        txt( 22.77f,  67.37f, "CARRIER",  2.12f, WH, MID);
-        txt( 54.78f,  87.73f, "EG",       2.12f, WH, MID);
-        txt( 79.5f,   87.8f,  "FILTER",  2.12f, WH, MID);
-        txt(107.9f,   87.8f,  "LFO",      2.12f, WH, MID);
-        txt( 23.3f,   98.5f,  "TRIGGERS", 2.12f, WH, MID);
+        txt( 24.21f,  18.26f, "VCO",      2.30f, WH, MID);
+        txt(207.84f,  18.26f, "VCA",      2.30f, WH, MID);
+        txt( 22.77f,  67.37f, "CARRIER",  2.30f, WH, MID);
+        txt( 54.78f,  87.73f, "EG",       2.30f, WH, MID);
+        txt( 79.5f,   87.8f,  "FILTER",   2.30f, WH, MID);
+        txt(107.9f,   87.8f,  "LFO",      2.30f, WH, MID);
+        txt( 23.3f,   98.5f,  "TRIGGERS", 2.30f, WH, MID);
 
         // Title / branding
 
@@ -1169,8 +1155,8 @@ void VocoderPanelDraw::draw(const DrawArgs& args) {
         // Filter section knob labels
         txt(68.79f,  92.46f, "FORMANT",   2.87f, WH, MID);
         txt(68.79f, 107.07f, "RESONANCE", 2.87f, WH, MID);
-        txt(96.13f,  92.46f, "LFO RATE",  2.87f, WH, MID);
-        txt(96.37f, 107.07f, "LFO DEPTH", 2.87f, WH, MID);
+        txt(96.13f,  92.46f, "RATE",  2.87f, WH, MID);
+        txt(96.37f, 107.07f, "DEPTH", 2.87f, WH, MID);
 
         // Envelope section labels
         txt(42.40f,  92.64f, "ATTACK", 2.87f, WH, MID);
@@ -1194,12 +1180,12 @@ void VocoderPanelDraw::draw(const DrawArgs& args) {
 
         // Port labels — right patchbay area
         txt(197.96f,  87.00f, "PROGRAM IN", 2.50f, WH, MID);
-        txt(175.96f, 103.00f, "EG OUT",     2.50f, WH, MID);
-        txt(175.75f, 113.25f, "LFO OUT",    2.50f, WH, MID);
+        txt(175.96f, 103.00f, "EG",          2.50f, WH, MID);
+        txt(175.75f, 113.25f, "LFO",        2.50f, WH, MID);
         txt(190.54f, 113.25f, "PROG ENV F", 2.50f, WH, MID);
         txt(191.21f, 103.00f, "EVEN",       2.50f, WH, MID);
         txt(205.47f, 103.00f, "ODD",        2.50f, WH, MID);
-        txt(205.50f, 113.25f, "OUT",        2.50f, WH, MID);
+        txt(205.50f, 113.25f, "MIX",        2.50f, WH, MID);
 
         // MODE button labels
         txt(147.62f, 89.37f, "MODE",        2.87f, WH, MID);
@@ -1227,13 +1213,11 @@ void VocoderPanelDraw::draw(const DrawArgs& args) {
         for (int i = 0; i < Vocoder::NUM_BANDS; i++) {
             char s[8];
             snprintf(s, sizeof(s), "VCA %d", i + 1);
-            txt(kBX[i], 63.75f, s, 1.90f, WH, MID);
+            txt(kBX[i], 63.75f, s, 2.30f, WH, MID);
         }
 
-        // Band ENV F output labels
-        for (int i = 0; i < Vocoder::NUM_BANDS; i++) {
-            txt(kBX[i], 74.75f, "OUT", 1.90f, WH, MID);
-        }
+        // Band ENV F output label — single centered label over the row
+        txt(kBX[0] + (kBX[Vocoder::NUM_BANDS - 1] - kBX[0]) * 0.5f, 74.75f, "OUT", 2.30f, WH, MID);
 }
 
 Model* modelVocoder = createModel<Vocoder, VocoderWidget>("Vocoder");
