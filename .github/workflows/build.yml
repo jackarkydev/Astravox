@@ -25,7 +25,7 @@ jobs:
           - os: macos-latest
             arch: mac-x64
             sdk_arch: mac-x64
-          - os: windows-latest
+          - os: ubuntu-latest
             arch: win-x64
             sdk_arch: win-x64
 
@@ -33,6 +33,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install Windows cross-compiler
+        if: matrix.arch == 'win-x64'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 binutils-mingw-w64-x86-64
 
       - name: Download Rack SDK
         shell: bash
@@ -45,6 +51,14 @@ jobs:
         run: |
           if [ "${{ matrix.arch }}" = "mac-x64" ]; then
             export CROSS_COMPILE=x86_64-apple-darwin
+          fi
+          if [ "${{ matrix.arch }}" = "win-x64" ]; then
+            # Use win32 thread model to avoid libwinpthread-1.dll dependency.
+            # Combined with -static-libgcc in Makefile, the plugin DLL depends
+            # only on libRack.dll and standard Windows DLLs.
+            export CC=x86_64-w64-mingw32-gcc-win32
+            export CXX=x86_64-w64-mingw32-g++-win32
+            export STRIP=x86_64-w64-mingw32-strip
           fi
           make dist RACK_DIR="$GITHUB_WORKSPACE/Rack-SDK"
 
