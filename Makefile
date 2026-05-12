@@ -5,6 +5,10 @@
 #   make RACK_DIR=/path/to/Rack-SDK
 RACK_DIR ?= ../Rack-SDK
 
+# Detect platform early so we can apply platform-specific linker flags
+# before including plugin.mk (which also includes arch.mk — safe to include twice).
+include $(RACK_DIR)/arch.mk
+
 # FLAGS will be passed to both the C and C++ compiler
 FLAGS +=
 CFLAGS +=
@@ -14,6 +18,15 @@ CXXFLAGS +=
 # the user's environment and library search path.
 # Static libraries are fine, but they should be added to this plugin's build system.
 LDFLAGS +=
+
+# plugin.mk statically links libstdc++ on Windows but not libgcc, leaving the
+# plugin DLL dependent on libgcc_s_seh-1.dll at a version tied to the compiler.
+# VCV Rack bundles its own copy of that DLL (matched to the rack-plugin-toolchain
+# MinGW), so a plugin built with any other MinGW version crashes on load.
+# Statically linking libgcc makes the plugin self-contained regardless of toolchain.
+ifdef ARCH_WIN
+LDFLAGS += -static-libgcc
+endif
 
 # Add .cpp files to the build
 SOURCES += $(wildcard src/*.cpp)
