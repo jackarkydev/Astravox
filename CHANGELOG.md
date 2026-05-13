@@ -1,5 +1,9 @@
 # Astravox Changelog
 
+## 2.0.3
+
+- Windows: fix plugin failing to load due to MinGW runtime mismatch. Build now cross-compiles from Linux with static libgcc and win32 thread model.
+
 ## 2.0.0 (in development)
 
 ### VOCODER
