@@ -1,0 +1,578 @@
+{
+  "version": 1,
+  "session1": {
+    "capstanRate": 23.025830258302584,
+    "capstanDepth": 0.0008208759641790019,
+    "loopRate": 0.44262942958766965,
+    "loopDepth": 0.00010435628717166701,
+    "noiseLPCutoff": 41.17285104770691,
+    "stochasticDepth": 0.07094876653769458,
+    "perHeadCorrelation": 0.85
+  },
+  "session2": {
+    "recommended_model": "tanh_clean_tape",
+    "clean_tape_measured": {
+      "shape": "tanh",
+      "driveScale": 0.9302,
+      "anchor_freq_hz": 100,
+      "anchor_level": "L6",
+      "anchor_tape_h3h1_db": -40.93,
+      "method": "single-anchor brentq solve on level-keyed-chain-subtracted H3/H1 at 100 Hz L6 (Session 2b Path 2)",
+      "note": "Stage 8 Saturation Mode menu 'Clean Tape (Measured)' preset. y(t) = tanh(drive \u00b7 x(t)) / tanh(drive)."
+    },
+    "chowdhury_attempt_2b": {
+      "Ms": 1.0,
+      "a": 0.9163,
+      "alpha": 0.0001,
+      "k": 0.002,
+      "c": 0.1,
+      "driveScale": 1.5388,
+      "residual": 88067.5,
+      "converged": false,
+      "note": "Did NOT converge \u2014 hit bounds on both a and k. Chowdhury's symmetric hysteresis cannot represent this RE-201's input-stage asymmetry. Retained for reference; do not ship."
+    },
+    "asymmetry_finding": {
+      "at_5khz_L6_h2_over_h1_db": -45.82,
+      "at_5khz_L6_h3_over_h1_db": -67.37,
+      "h2_minus_h3_db": 21.55,
+      "note": "Smoking gun: at 5 kHz L6 the unit's H2 is 21.5 dB louder than H3. Chowdhury is odd-symmetric by construction (H3-dominant). Asymmetric distortion is genuinely the RE-201 input stage \u2014 confirmed by clean level-keyed loopback reference. This is the 'Path 2' branch from deferred_work.md \u00a73."
+    },
+    "saturation_onset_dbfs": -1.6,
+    "dominant_distortion_lf": "H3 dominant at 50/100/500 Hz (odd-symmetric, tape-like)",
+    "dominant_distortion_hf": "H2 dominant at 5 kHz by ~21 dB (asymmetric, input-stage character)",
+    "tape_character": "Very clean/linear at LF; mild asymmetric input-stage distortion at HF that dominates above ~1 kHz. tanh Clean Tape captures the LF tape character; HF asymmetry is not modeled in v1.0 (low audible impact at the saturating levels reached in normal play).",
+    "chain_reference_status": "Level-keyed loopback recorded at 35 (freq, level) combinations \u2014 chain gain flat within 0.5 dB L2..L6 across the 50 Hz \u2013 5 kHz band. Verified the chain adds no level-dependent distortion; H2 asymmetry is the unit, not the chain.",
+    "stage_8_implication": "The 'Clean Tape (Measured)' preset ships with this driveScale. The 'Worn' / 'Chewed' / 'CV Only' presets continue to use Chowdhury with paper-derived params \u2014 they do not depend on Session 2/2b."
+  },
+  "session3": {
+    "head1": {
+      "slow": {
+        "bumpFreq": 193.74,
+        "bumpGain": 0.0575,
+        "bumpQ": 2.3591,
+        "hfCutoff": 9530.6
+      },
+      "med": {
+        "bumpFreq": 78.75,
+        "bumpGain": 0.0,
+        "bumpQ": 3.0,
+        "hfCutoff": 10233.4
+      },
+      "fast": {
+        "bumpFreq": 107.55,
+        "bumpGain": 0.0,
+        "bumpQ": 3.0,
+        "hfCutoff": 9804.2
+      }
+    },
+    "head2": {
+      "slow": {
+        "bumpFreq": 173.42,
+        "bumpGain": 0.0784,
+        "bumpQ": 3.0,
+        "hfCutoff": 9649.6
+      },
+      "med": {
+        "bumpFreq": 78.67,
+        "bumpGain": 0.0,
+        "bumpQ": 3.0,
+        "hfCutoff": 9994.9
+      },
+      "fast": {
+        "bumpFreq": 202.79,
+        "bumpGain": 0.0385,
+        "bumpQ": 2.9915,
+        "hfCutoff": 9638.6
+      }
+    },
+    "head3": {
+      "slow": {
+        "bumpFreq": 234.89,
+        "bumpGain": 0.0485,
+        "bumpQ": 0.3,
+        "hfCutoff": 9507.6
+      },
+      "med": {
+        "bumpFreq": 197.13,
+        "bumpGain": 0.0207,
+        "bumpQ": 3.0,
+        "hfCutoff": 10181.6
+      },
+      "fast": {
+        "bumpFreq": 183.1,
+        "bumpGain": 0.0076,
+        "bumpQ": 3.0,
+        "hfCutoff": 9875.7
+      }
+    },
+    "notes": "Farina deconvolution vs loopback, 1/12-oct smoothed, fitted 60-14 kHz. bumpGain near-zero across all heads/speeds \u2014 measured response is primarily HF rolloff, no significant head bump. hfCutoff ~9.5-10.2 kHz, little speed dependence."
+  },
+  "session4": {
+    "rt60": {
+      "reference_level": "L4",
+      "stage_5_target_rt60_s": 3.976,
+      "stage_5_target_method": "T30 mean (L3\u2013L6) \u2014 audible-behavior model; sits between T20 (initial radiation) and T60-direct (full modal tail to \u221260 dB).  L2 excluded from T30/T60-direct means because its EDC dynamic range (~\u221287 dB) is too close to the T30 fit window upper limit (\u221235 dB), biasing the slope shallow.",
+      "mean_t20_s": 3.468,
+      "std_t20_s": 0.225,
+      "t20_levels_used": [
+        "L2",
+        "L3",
+        "L4",
+        "L5",
+        "L6"
+      ],
+      "mean_t30_s": 3.976,
+      "std_t30_s": 0.228,
+      "t30_levels_used": [
+        "L3",
+        "L4",
+        "L5",
+        "L6"
+      ],
+      "mean_t60_direct_s": 7.413,
+      "std_t60_direct_s": 0.446,
+      "t60_direct_levels_used": [
+        "L3",
+        "L4",
+        "L5",
+        "L6"
+      ],
+      "per_level": {
+        "L1": {
+          "rt60_from_t20_s": 18.599,
+          "rt60_from_t30_s": 17.917,
+          "rt60_direct_s": 16.583,
+          "t20_slope_db_s": -3.23,
+          "t20_fit_r2": 0.8314,
+          "edc_final_db": -74.8
+        },
+        "L2": {
+          "rt60_from_t20_s": 3.828,
+          "rt60_from_t30_s": 9.571,
+          "rt60_direct_s": 10.919,
+          "t20_slope_db_s": -15.67,
+          "t20_fit_r2": 0.9937,
+          "edc_final_db": -87.29
+        },
+        "L3": {
+          "rt60_from_t20_s": 3.5,
+          "rt60_from_t30_s": 4.156,
+          "rt60_direct_s": 8.186,
+          "t20_slope_db_s": -17.14,
+          "t20_fit_r2": 0.996,
+          "edc_final_db": -91.49
+        },
+        "L4": {
+          "rt60_from_t20_s": 3.543,
+          "rt60_from_t30_s": 4.232,
+          "rt60_direct_s": 7.172,
+          "t20_slope_db_s": -16.94,
+          "t20_fit_r2": 0.9955,
+          "edc_final_db": -89.62
+        },
+        "L5": {
+          "rt60_from_t20_s": 3.295,
+          "rt60_from_t30_s": 3.842,
+          "rt60_direct_s": 7.138,
+          "t20_slope_db_s": -18.21,
+          "t20_fit_r2": 0.9918,
+          "edc_final_db": -99.51
+        },
+        "L6": {
+          "rt60_from_t20_s": 3.175,
+          "rt60_from_t30_s": 3.672,
+          "rt60_direct_s": 7.157,
+          "t20_slope_db_s": -18.9,
+          "t20_fit_r2": 0.9856,
+          "edc_final_db": -117.38
+        }
+      },
+      "method": "Schroeder backward integration; three RT60 estimates: T20 (\u22125\u2192\u221225 dB \u00d7 3), T30 (\u22125\u2192\u221235 dB \u00d7 2), T60-direct (\u22125\u2192\u221265 dB linear fit).",
+      "note": "L1 (\u221230 dBFS source) is noise-floor-limited and excluded from the L2\u2013L6 means.  The RE-201 spring exhibits a bi-exponential decay: a steep initial radiation phase (slope ~\u221217 dB/s) followed by a long modal tail (slope ~\u22128 dB/s).  T20 and T60-direct therefore disagree by ~2\u00d7 \u2014 choose your target deliberately."
+    },
+    "damping": {
+      "lp_cutoff_fit_hz": null,
+      "passband_upper_edge_hz": 2074.2,
+      "recommended_lp_cutoff_hz": 2074.2,
+      "per_band_rt60_s": {
+        "125": {
+          "rt60_s": 0.082,
+          "fit_r2": 0.9647,
+          "sustain_ratio_db": -38.38,
+          "in_spring_passband": false,
+          "usable_for_damping_fit": false
+        },
+        "250": {
+          "rt60_s": 0.042,
+          "fit_r2": 0.9638,
+          "sustain_ratio_db": -38.58,
+          "in_spring_passband": false,
+          "usable_for_damping_fit": false
+        },
+        "500": {
+          "rt60_s": 2.412,
+          "fit_r2": 0.7231,
+          "sustain_ratio_db": -20.93,
+          "in_spring_passband": true,
+          "usable_for_damping_fit": true
+        },
+        "1000": {
+          "rt60_s": 3.359,
+          "fit_r2": 0.9915,
+          "sustain_ratio_db": -12.16,
+          "in_spring_passband": true,
+          "usable_for_damping_fit": true
+        },
+        "2000": {
+          "rt60_s": 2.72,
+          "fit_r2": 0.9938,
+          "sustain_ratio_db": -12.97,
+          "in_spring_passband": true,
+          "usable_for_damping_fit": true
+        },
+        "4000": {
+          "rt60_s": 0.004,
+          "fit_r2": 0.927,
+          "sustain_ratio_db": -25.96,
+          "in_spring_passband": true,
+          "usable_for_damping_fit": false
+        },
+        "8000": {
+          "rt60_s": 0.001,
+          "fit_r2": 0.9503,
+          "sustain_ratio_db": -53.81,
+          "in_spring_passband": false,
+          "usable_for_damping_fit": false
+        }
+      },
+      "note": "Spring is a resonant bandpass (~1 kHz peak), not a low-pass \u2014 per-band RT60 is non-monotonic, so an LP-cutoff fit is unreliable.  recommended_lp_cutoff_hz uses the measured passband upper edge as the FDN per-line LP cutoff: cuts HF leakage outside the spring's natural response."
+    },
+    "dispersion": {
+      "f_lo_hz": 581.9,
+      "f_hi_hz": 2074.2,
+      "chirp_descent_ms": null,
+      "method": "STFT energy of first 200 ms of IR; 5/95 % cumulative power bounds; chirp duration via dominant-bin ridge descent from 2 kHz \u2192 300 Hz.",
+      "note": "This range is the spring tank's effective passband \u2014 i.e. where the spring physically radiates energy \u2014 and should set the lower/upper bounds of the dispersion allpass cascade.  Note this is narrower than the Stage 5 placeholder (50\u20135000 Hz); the RE-201 spring is genuinely bandlimited."
+    },
+    "modal_envelope": {
+      "freqs_hz": [
+        40.0,
+        45.21,
+        51.1,
+        57.75,
+        65.27,
+        73.78,
+        83.38,
+        94.24,
+        106.52,
+        120.39,
+        136.07,
+        153.79,
+        173.82,
+        196.46,
+        222.05,
+        250.97,
+        283.65,
+        320.6,
+        362.35,
+        409.54,
+        462.88,
+        523.17,
+        591.31,
+        668.32,
+        755.36,
+        853.74,
+        964.93,
+        1090.6,
+        1232.64,
+        1393.18,
+        1574.63,
+        1779.71,
+        2011.49,
+        2273.47,
+        2569.57,
+        2904.23,
+        3282.47,
+        3709.98,
+        4193.17,
+        4739.29,
+        5356.53,
+        6054.16,
+        6842.66,
+        7733.84,
+        8741.1,
+        9879.54,
+        11166.25,
+        12620.54,
+        14264.23,
+        16122.0
+      ],
+      "mag_db": [
+        -43.95,
+        -60.51,
+        -72.49,
+        -78.9,
+        -81.04,
+        -80.54,
+        -78.37,
+        -75.14,
+        -71.25,
+        -66.82,
+        -62.1,
+        -57.38,
+        -52.83,
+        -48.37,
+        -43.93,
+        -39.73,
+        -36.06,
+        -33.18,
+        -31.21,
+        -29.91,
+        -28.97,
+        -28.04,
+        -27.0,
+        -26.01,
+        -25.44,
+        -25.61,
+        -26.51,
+        -27.81,
+        -29.09,
+        -30.21,
+        -31.37,
+        -33.09,
+        -35.82,
+        -39.57,
+        -43.82,
+        -48.14,
+        -52.59,
+        -57.51,
+        -62.9,
+        -68.27,
+        -72.95,
+        -76.49,
+        -78.62,
+        -79.15,
+        -77.93,
+        -74.81,
+        -70.09,
+        -64.09,
+        -56.35,
+        -45.88
+      ],
+      "note": "1/3-octave smoothed FFT magnitude of the 200\u20131000 ms IR tail (reference level).  Used qualitatively to verify FDN spectral balance against the measured spring."
+    },
+    "noise_floor": {
+      "rms_linear": 0.0005644,
+      "rms_dbfs": -64.97,
+      "peak_dbfs": -46.32,
+      "band_power_db": {
+        "20-100": -86.47,
+        "100-500": -82.32,
+        "500-2k": -77.54,
+        "2k-8k": -82.64,
+        "8k-20k": -82.66
+      },
+      "dominant_tones_hz": [
+        {
+          "hz": 7998.0,
+          "level_db": -85.8
+        },
+        {
+          "hz": 480.5,
+          "level_db": -87.5
+        },
+        {
+          "hz": 58.6,
+          "level_db": -89.5
+        },
+        {
+          "hz": 16002.0,
+          "level_db": -89.6
+        },
+        {
+          "hz": 902.3,
+          "level_db": -91.4
+        },
+        {
+          "hz": 24000.0,
+          "level_db": -93.2
+        },
+        {
+          "hz": 181.6,
+          "level_db": -93.5
+        },
+        {
+          "hz": 720.7,
+          "level_db": -94.8
+        }
+      ],
+      "duration_s": 61.39
+    },
+    "noise_floor_revvol_max": {
+      "rms_dbfs": -65.33,
+      "peak_dbfs": -51.13,
+      "band_power_db": {
+        "20-100": -86.6,
+        "100-500": -84.9,
+        "500-2k": -75.05,
+        "2k-8k": -82.69,
+        "8k-20k": -82.76
+      },
+      "duration_s": 78.06,
+      "note": "Session 4b \u2014 Reverb Volume fully CW (max). Captured 2026-05-14 on the same chain/Repeat Rate/room as Session 4a."
+    },
+    "noise_floor_revvol_scaling": {
+      "per_band_delta_db_30pct_to_max": {
+        "20-100": -0.13,
+        "100-500": -2.58,
+        "500-2k": 2.49,
+        "2k-8k": -0.05,
+        "8k-20k": -0.1
+      },
+      "spring_passband_delta_db": 2.49,
+      "note": "Only the spring-passband band (500\u20132 kHz) shifts with Reverb Volume; other bands are chain/room-noise dominated and are independent of the control. Stage 5 noiseFloorGain should treat Reverb Volume as scaling only the spring-passband contribution, not the total noise floor. The +2.5 dB total swing from 30% to max is much smaller than the +8 dB Stage-5 ear-tuned guess \u2014 noiseFloorGain at the audible max should likely come down."
+    },
+    "reverb_volume_scaling": {
+      "low": {
+        "peak_dbfs": -14.81,
+        "rms_dbfs": -30.8
+      },
+      "mid": {
+        "peak_dbfs": -5.66,
+        "rms_dbfs": -26.85
+      },
+      "high": {
+        "peak_dbfs": -0.32,
+        "rms_dbfs": -22.51
+      }
+    },
+    "input_saturation_1khz": {
+      "L1": {
+        "H1_db": 51.36,
+        "H2_minus_H1_db": -59.08,
+        "H3_minus_H1_db": -63.54
+      },
+      "L2": {
+        "H1_db": 61.37,
+        "H2_minus_H1_db": -50.07,
+        "H3_minus_H1_db": -66.61
+      },
+      "L3": {
+        "H1_db": 69.37,
+        "H2_minus_H1_db": -41.74,
+        "H3_minus_H1_db": -69.98
+      },
+      "L4": {
+        "H1_db": 75.31,
+        "H2_minus_H1_db": -37.65,
+        "H3_minus_H1_db": -60.07
+      },
+      "L5": {
+        "H1_db": 77.8,
+        "H2_minus_H1_db": -39.55,
+        "H3_minus_H1_db": -55.48
+      },
+      "L6": {
+        "H1_db": 81.44,
+        "H2_minus_H1_db": -42.81,
+        "H3_minus_H1_db": -55.67
+      }
+    },
+    "analysis_notes": "IRs extracted via Wiener deconvolution against the per-level source sweep (chain loopback not used; chain is roughly linear and per-band damping is the dominant question, not chain EQ). Reference level L4 (\u22126 dBFS source) chosen as the best compromise between noise headroom and spring linearity. See accompanying PNGs for fit diagnostics.",
+    "session_4b_flags": [],
+    "protocol_notes": [
+      "Reverb Volume position: confirmed 9 o'clock (~30 %) across all Session 4 sub-measurements (verified against the front-panel HEIC photos).  The \"70 %\" figure in the sub-measurement 1 header of _session_notes.md is a template artifact and should be disregarded.",
+      "Follow-up capture queued \u2014 see deferred_work.md \u00a74 (Session 4b): noise-floor recording at Reverb Volume fully CW, used to calibrate Stage 5's in-module noiseFloorGain at the max user setting rather than extrapolating from the 30 %-position \u221265 dBFS reading."
+    ]
+  },
+  "session5": {
+    "model": "single_pole",
+    "tauUp_s": 0.2151,
+    "tauDown_s": 0.2751,
+    "weight2": 0.4685,
+    "tau1Up_s": 0.2151,
+    "tau2Up_s": 0.2151,
+    "tau1Down_s": 0.2751,
+    "tau2Down_s": 0.2751,
+    "method": "Envelope-based fit on bandpassed 1 kHz tone through the RE-201 echo path; single-exp parameters from scipy curve_fit on 20 Hz LPF envelope across spinup/spindown cliffs at slow/med/fast head selector positions.",
+    "diagnostics": {
+      "spinup_tau_per_recording_ms": {
+        "slow": 206.4,
+        "med": 243.2,
+        "fast": 195.8
+      },
+      "spindown_tau_per_recording_ms": {
+        "slow": 278.3,
+        "med": 278.2,
+        "fast": 268.8
+      },
+      "spinup_10_90_per_recording_ms": {
+        "slow": 87.2,
+        "med": 102.4
+      },
+      "spindown_10_90_per_recording_ms": {
+        "slow": 146.0,
+        "med": 146.0
+      },
+      "note": "10-90 closed-form \u03c4 is roughly half the curve_fit \u03c4 \u2014 the underlying motor cliff is sharper than a pure exponential and the data has a slow tail. curve_fit value is the better match to the perceived audible glide; 10-90 reflects the steepest portion of the cliff. Two-exp fits collapsed to the single-pole solution (no slow-tail component statistically warranted). Stage 6 should use the single-pole branch with tauUp_s/tauDown_s."
+    },
+    "notes": [
+      "Recordings: motor spinup and spindown at slow/med/fast head selector positions, 1 kHz live input through echo path, 96 kHz / float mono.",
+      "Method note: pitch tracking was inappropriate for these recordings (the live-input setup keeps the playback frequency near 1 kHz throughout; the motor curve is carried by the signal amplitude). Switched to envelope-based fit.",
+      "If Session 5 is re-recorded with a pre-recorded 1 kHz tape loop (varispeed playback), pitch tracking becomes viable and 10-90 may give a cleaner motor-only \u03c4."
+    ]
+  },
+  "session6": {
+    "crosstalkAdjacent_dB": -30.59,
+    "crosstalkNonAdjacent_dB": -37.11,
+    "method": "Farina log-sweep deconvolution per recording, dry-through aligned. Crosstalk = peak |IR| at the supposedly-off head's solo-tap offset, relative to the active head's main tap.",
+    "diagnostics": {
+      "adjacent_stats": {
+        "mean_db": -30.59,
+        "min_db": -36.3,
+        "max_db": -27.1,
+        "n": 12
+      },
+      "non_adjacent_stats": {
+        "mean_db": -37.11,
+        "min_db": -43.12,
+        "max_db": -33.0,
+        "n": 6
+      },
+      "head_spacing_ratios_h2_over_h1": {
+        "slow": 1.98,
+        "med": 2.0,
+        "fast": 2.0
+      },
+      "head_spacing_ratios_h3_over_h1": {
+        "slow": 2.84,
+        "med": 2.97,
+        "fast": 2.97
+      },
+      "h1_tap_ms_per_speed": {
+        "slow": 167.4,
+        "med": 107.9,
+        "fast": 64.0
+      }
+    },
+    "notes": [
+      "21 recordings (h1, h2, h3, h12, h23, h13, h123 \u00d7 slow/med/fast). \u221210 dBFS source level (10 dB hotter than Sessions 1/3) for crosstalk SNR.",
+      "Adjacent (h1\u2194h2, h2\u2194h3) crosstalk averages \u221230.6 dB; non-adjacent (h1\u2194h3) averages \u221237.1 dB. Slight increase with speed but within ~3 dB band \u2014 Stage 7 can treat as scalar weights.",
+      "Head spacing on this unit is uniform: h2 \u2248 2\u00d7h1, h3 \u2248 3\u00d7h1, consistent across all three speeds. This contradicts Stage 1's TAP_FRACTIONS = {0.18, 0.41, 0.74} which encodes non-uniform spacing \u2014 flagged for a Stage 1 revisit.",
+      "Comb-notch analysis attempted but not load-bearing: \u0394t = 60\u2013160 ms across speeds places the fundamental notch at 3\u20138 Hz, well below audibility. The pair sum manifests as rhythmic echo, not a flanger-style notch comb."
+    ]
+  },
+  "session8": {
+    "model": "critically_damped",
+    "tauUp_s": 0.0917,
+    "tauDown_s": 0.1319,
+    "method": "Repeat Rate knob turned live on the real RE-201 (Mode 1, Intensity 0, continuous 1kHz sine, dry-nulled), Hilbert IF integrated to a delay trajectory then converted to tapeSpeed and fit to the critically-damped 2nd-order step response 1-(1+t/tau)e^(-t/tau). 8 conditions (decel/accel x full/half range x fast/slow knob-turn speed), 1 take each -- see measurements/params/session8_motor_transient.json for full diagnostics.",
+    "diagnostics": {
+      "tauUp_s_std": 0.0687,
+      "tauDown_s_std": 0.0413,
+      "n_up": 4,
+      "n_down": 4,
+      "note": "Fast vs. slow physical knob-turn speed didn't change the measured transition duration (all ~45-110ms) -- servo dynamics dominate, not hand speed -- so taus are averaged across fast+slow and full+half. Per-take spread is real (single takes, no repeats); the up/down split direction is consistent across all 4 pairs. Applies to Motor Stop's glide too (shared smoother) by extrapolation -- Session 8 only measured knob turns with the motor running continuously."
+    }
+  }
+}

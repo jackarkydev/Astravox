@@ -7,4 +7,5 @@ void init(Plugin* p) {
 
 	// Register each module — slug must match plugin.json exactly
 	p->addModel(modelVocoder);
+	p->addModel(modelTapeEcho);
 }

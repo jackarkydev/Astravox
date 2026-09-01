@@ -1,5 +1,5 @@
 # Astravox — VCV Rack Plugin
-# Vocal processing suite: Vocoder + Expander
+# Modules: Vocoder + Tape Echo
 #
 # RACK_DIR points to the extracted Rack SDK — set via environment or command line:
 #   make RACK_DIR=/path/to/Rack-SDK
@@ -49,3 +49,9 @@ localinstall: all
 	cp plugin.json "$(INSTALL_DIR)/"
 	cp -r res "$(INSTALL_DIR)/"
 	@echo "Installed Astravox to $(INSTALL_DIR)"
+
+# Dev-only regression harness targets. Kept in a separate file that is NOT part
+# of the dev -> public release rsync, so the public repo does not ship targets
+# pointing at measurements/regression, which only exists here. The leading `-`
+# makes the include silently no-op where the file is absent.
+-include regress.mk
