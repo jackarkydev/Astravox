@@ -22,21 +22,24 @@
 // L1(soft/long) → L6(hard/tight); IRs resample to engine SR on SR change.
 // Latency = one partition (10.7ms @ 96k), inaudible on a parallel wet send.
 
+// Plain file-scope helpers rather than local lambdas: cppcheck's resourceLeak
+// check has misattributed these lambdas' own early returns (short-read case)
+// as leaking the caller's FILE* when they were defined inline in loadWavMono.
+static uint32_t rdU32(FILE* fh) {
+    uint8_t b[4]; if (std::fread(b, 1, 4, fh) != 4) return 0;
+    return (uint32_t)b[0] | ((uint32_t)b[1]<<8) | ((uint32_t)b[2]<<16) | ((uint32_t)b[3]<<24);
+}
+static uint16_t rdU16(FILE* fh) {
+    uint8_t b[2]; if (std::fread(b, 1, 2, fh) != 2) return 0;
+    return (uint16_t)b[0] | ((uint16_t)b[1]<<8);
+}
+
 // Minimal WAV reader — float32 / int16 / int24 PCM mono. Returns true on success.
 // Used once at module construction; not RT-safe. If `outSR` is non-null it
 // receives the file's declared sample rate.
 static bool loadWavMono(const std::string& path, std::vector<float>& out, uint32_t* outSR = nullptr) {
     FILE* f = std::fopen(path.c_str(), "rb");
     if (!f) return false;
-
-    auto rdU32 = [](FILE* fh) -> uint32_t {
-        uint8_t b[4]; if (std::fread(b, 1, 4, fh) != 4) return 0;
-        return (uint32_t)b[0] | ((uint32_t)b[1]<<8) | ((uint32_t)b[2]<<16) | ((uint32_t)b[3]<<24);
-    };
-    auto rdU16 = [](FILE* fh) -> uint16_t {
-        uint8_t b[2]; if (std::fread(b, 1, 2, fh) != 2) return 0;
-        return (uint16_t)b[0] | ((uint16_t)b[1]<<8);
-    };
 
     // Every size below is bounded against the real file length BEFORE
     // anything is allocated — otherwise a corrupt `data` header declaring a

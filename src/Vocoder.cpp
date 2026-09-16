@@ -724,8 +724,6 @@ struct VocoderWidget : ModuleWidget {
         fbw->box = box;
         auto* pd = new VocoderPanelDraw;
         pd->box = box;
-        pd->font      = APP->window->loadFont(asset::plugin(pluginInstance, "res/AVPosterGothic-Regular.otf"));
-        pd->fontLight = APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/Inter-Light.otf"));
         fbw->addChild(pd);
         addChild(fbw);
     }
@@ -907,6 +905,12 @@ struct VocoderWidget : ModuleWidget {
 };
 
 void VocoderPanelDraw::draw(const DrawArgs& args) {
+        // Loaded lazily here rather than at widget construction: loadFont() needs a
+        // valid NanoVG context, which draw() guarantees and the constructor does not
+        // (module-browser/library preview widgets can be built without one).
+        // https://vcvrack.com/manual/Migrate2#2-Potential-runtime-bugs
+        if (!font)      font      = APP->window->loadFont(asset::plugin(pluginInstance, "res/AVPosterGothic-Regular.otf"));
+        if (!fontLight) fontLight = APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/Inter-Light.otf"));
         if (!font) return;
 
         NVGcontext* vg = args.vg;

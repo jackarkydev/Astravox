@@ -34,15 +34,15 @@ struct State {
 
     // model parameters (set by cook())
     float M_s = 1.25f, a = 0.2080f, c = 0.6971f, k = 0.47875f;
-    float nc, M_s_oa, M_s_oa_talpha, M_s_oa_tc, M_s_oa_tc_talpha;
-    float M_s_oaSq_tc_talpha, M_s_oaSq_tc_talphaSq;
+    float nc = 0.f, M_s_oa = 0.f, M_s_oa_talpha = 0.f, M_s_oa_tc = 0.f, M_s_oa_tc_talpha = 0.f;
+    float M_s_oaSq_tc_talpha = 0.f, M_s_oaSq_tc_talphaSq = 0.f;
     float upperLim = 20.f;
 
     // per-sample temporaries (written by hysteresisFunc, read by hysteresisFuncPrime)
-    float Q, M_diff, L_prime, kap1, f1Denom, f1, f2, f3;
-    float coth, oneOverQ, oneOverQSq, oneOverQCubed, cothSq;
-    float oneOverF1Denom, oneOverF3;
-    bool nearZero;
+    float Q = 0.f, M_diff = 0.f, L_prime = 0.f, kap1 = 0.f, f1Denom = 0.f, f1 = 0.f, f2 = 0.f, f3 = 0.f;
+    float coth = 0.f, oneOverQ = 0.f, oneOverQSq = 0.f, oneOverQCubed = 0.f, cothSq = 0.f;
+    float oneOverF1Denom = 0.f, oneOverF3 = 0.f;
+    bool nearZero = false;
 
     void cook(float drive, float sat, float width) {
         M_s = 0.5f + 1.5f * (1.f - sat);

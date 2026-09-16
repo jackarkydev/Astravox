@@ -14,8 +14,20 @@
 // Per-head EQ: head-bump peaking biquad + HF rolloff, speed-coupled
 // =============================================================================
 struct HeadEQ {
-    struct BiquadCoefs { float b0, b1, b2, a1, a2; };
-    struct DetentParams { float bumpFreq, bumpGain, bumpQ, hfCutoff; };
+    // Zero-initialized defensively: real values always come from the explicit
+    // {slow,med,fast} assignment in the module constructor and computeCoefs()
+    // before any of these are read, but a struct with no ctor and no member
+    // initializers is otherwise UB-on-read if that ordering is ever broken.
+    struct BiquadCoefs { float b0 = 0.f, b1 = 0.f, b2 = 0.f, a1 = 0.f, a2 = 0.f; };
+    // Explicit ctors (not left as an aggregate) so the {bumpFreq, bumpGain, bumpQ,
+    // hfCutoff} literals assigned in the module constructor still list-initialize
+    // in C++11, where a class with default member initializers isn't an aggregate.
+    struct DetentParams {
+        float bumpFreq = 0.f, bumpGain = 0.f, bumpQ = 1.f, hfCutoff = 20000.f;
+        DetentParams() = default;
+        DetentParams(float bumpFreq, float bumpGain, float bumpQ, float hfCutoff)
+            : bumpFreq(bumpFreq), bumpGain(bumpGain), bumpQ(bumpQ), hfCutoff(hfCutoff) {}
+    };
 
     DetentParams slow, med, fast;
     BiquadCoefs peakSlow, peakMed, peakFast;

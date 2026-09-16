@@ -1,5 +1,12 @@
 # Astravox Changelog
 
+## 2.1.1
+
+### Fixes
+
+- Vocoder: fixed panel fonts being loaded outside a safe `draw()` context, which could also leave the module-browser/library preview blank.
+- Tape Echo: hardened the spring-reverb WAV loader and head-EQ/hysteresis state against a set of static-analysis findings (uninitialized members, a missing copy-constructor guard on the convolver, a cppcheck false positive in the WAV reader). No audible or behavioral change.
+
 ## 2.1.0
 
 ### TAPE ECHO — new module

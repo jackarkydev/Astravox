@@ -79,6 +79,10 @@ struct SatPath : OversampledStage {
     // biasEnv is recursive state — must be cleared alongside the solver, or a
     // stray NaN poisons every subsequent sample silently.
     void resetState() { state.reset(); biasEnv = 0.f; }
+    // Deliberately hides OversampledStage::reset() (non-virtual) rather than
+    // extending it under a new name: every call site holds a concrete SatPath,
+    // never an OversampledStage&/*, so the hiding can't silently pick the
+    // base's partial reset() instead of this one.
     void reset()      { resetFilters(); resetState(); }
 
     float process(float in, bool ecoMode, float T8, float T4) {

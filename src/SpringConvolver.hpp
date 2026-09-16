@@ -44,6 +44,13 @@ struct SpringConvolver {
         delete fft;
     }
 
+    // Owns `fft` by raw pointer; an implicit copy would double-delete it.
+    // Never actually copied today (direct member / unique_ptr everywhere it's
+    // used) — deleted so a future refactor can't introduce that silently.
+    SpringConvolver(const SpringConvolver&) = delete;
+    SpringConvolver& operator=(const SpringConvolver&) = delete;
+    SpringConvolver() = default;
+
     // Loads NUM_LEVELS mono IRs (all must share the same length) and precomputes
     // every level's partition spectra. NOT real-time safe — call only from
     // module construction / onSampleRateChange().
