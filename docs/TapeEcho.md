@@ -65,10 +65,37 @@ Echo Volume and Reverb Volume mix the tap signal and the spring reverb into the 
 | Jack | Description |
 |------|-------------|
 | **OUT** | Main mixed output (echo taps + reverb, through tone and the output pad). |
-| **H1 / H2 / H3** | Individual tape-head outputs. |
+| **H1 / H2 / H3** | Individual tape-head outputs — what each playback head reads off the tape. See **Head outputs** below. |
 | **FB SEND** | Feedback-loop send — the signal available for external insert processing before it re-enters the loop via FB RETURN. |
 
-> **H1/H2/H3 carry only the delayed tap, never the dry source** — unlike OUT, which sums dry + wet. Each head stays live even when MODE doesn't route it into the main mix, and bypasses Echo/Reverb Volume, Bass/Treble, the Output Pad, and OUT's final clipping — so on a hot or near-self-oscillating loop, a head can pass a peak that OUT's clip stage caught.
+> **H1/H2/H3 carry only the delayed tap, never the dry source** — unlike OUT, which sums dry + wet. Each head stays live even when MODE doesn't route it into the main mix, and bypasses Echo/Reverb Volume, the Output Pad, and OUT's final clipping — so on a hot or near-self-oscillating loop, a head can pass a peak that OUT's clip stage caught.
+
+### Head outputs
+
+A head output is whatever that playback head reads off the tape. The simplest way to predict it: **anything that changes what gets recorded onto the tape reaches the heads; anything applied after playback, on the way to OUT, does not.** The feedback loop records onto the tape too, so loop settings reach the heads from the **second repeat onward** — the first repeat of a new sound was recorded straight from IN.
+
+| Reaches the head outputs | |
+|---|---|
+| **Every repeat** | Input Drive and Drive tilt; tape saturation and hysteresis; wow & flutter; Tape Age (high-frequency loss, loop noise, dropouts); Repeat Rate, Rate nudge and Gang; Reverse (the heads play the reversed tape); Motor Stop (the heads fade with the motor). Each head also carries a small amount of bleed from the neighbouring heads, as on the real head block. |
+| **From the second repeat** | Intensity; Mode (only the heads Mode routes into the mix are recorded back onto the tape); Bass/Treble while **Tone in feedback loop** is on (the default); FB RETURN while **Insert point** is **In-loop** (the default). |
+
+| Never reaches the head outputs |
+|---|
+| The dry signal, Echo Volume, Reverb Volume and the spring reverb, the Output Pad, OUT's soft clip and limiter, **Output: wet only**, Bass/Treble when **Tone in feedback loop** is off, and FB RETURN when **Insert point** is **Output only**. |
+
+Some consequences worth knowing:
+
+- **Mode doesn't switch a head output on or off — it changes what's on the tape.** A head that Mode leaves out still plays back everything the selected heads recorded, so its later repeats follow their rhythm, offset by its own position. In Mode 1 (Tap 1), for example, H3 replays H1's regenerating echoes as well as the original. In **Reverb only** (0) no head feeds the loop, so each head gives a single repeat and Intensity has no effect on them.
+- **Bass/Treble reach the heads only through the loop.** With **Tone in feedback loop** on, a head's first repeat is flat and each later repeat is progressively more coloured; with it off, the heads never hear the tone controls.
+
+**Send/Return effects and the head outputs.** Whether an external Send/Return effect reaches the head outputs depends only on **Insert point**, not on **Return mode**: **In-loop** records the effect onto the tape, so every head carries it from the second repeat onward; **Output only** sends it to OUT alone.
+
+| Insert point | Return mode | Effect on OUT? | Effect on H1–H3? |
+|---|---|---|---|
+| In-loop | Replace | Yes | **Yes**, from the second repeat |
+| In-loop | Sum | Yes | **Yes**, from the second repeat |
+| Output only | Replace | Yes | **No** |
+| Output only | Sum | Yes | **No** |
 
 ---
 
@@ -242,8 +269,13 @@ Tape Age isn't a single "more distortion" knob — it drives several linked effe
 - If **Output: wet only** is enabled in the context menu, there is no dry path — that's expected for effects-send use.
 
 **Head outputs (H1/H2/H3) sound harsher, or pass a peak, that OUT doesn't:**
-- Expected. The head taps come straight off the tape and skip everything that shapes OUT — Echo Volume, the head-averaging mix law, the Output Pad, and OUT's soft-clip and limiter stages. So they will pass peaks OUT's clipping caught, and read harsher when the loop is hot or near self-oscillation. Pad or limit them externally if needed.
+- Expected. The head taps come straight off the tape and skip everything applied on the way to OUT — Echo Volume, the head-averaging mix law, the Output Pad, and OUT's soft-clip and limiter stages (see **Head outputs**). So they will pass peaks OUT's clipping caught, and read harsher when the loop is hot or near self-oscillation. Pad or limit them externally if needed.
 - Don't assume they're the *louder* jack, though. With the Output Pad at 0 dB, OUT is normally louder — it carries the dry signal and any reverb alongside the echo, where a head output is a single echo tap on its own. What flips that is the Output Pad and Echo Volume: neither one touches the head outputs, so turning either down drops OUT while the heads stay exactly where they were. That's when a head can end up hotter than OUT.
+
+**A head output doesn't carry my Send/Return effect, or Bass/Treble, the way OUT does:**
+- Check **Send/Return → Insert point**. With **Output only**, the returned signal goes to OUT alone and never reaches the tape, so the heads never hear it. With **In-loop** it is recorded onto the tape and appears on the heads from the second repeat onward.
+- The first repeat of any new sound on a head is always unprocessed — it was recorded straight from IN. Processing builds up on later repeats.
+- Bass/Treble follow the same rule: they reach the heads only while **Tone in feedback loop** is on, and only from the second repeat.
 
 **Intensity (or a full Gang sweep) won't push the loop into self-oscillation, no matter how far you turn it:**
 - Some Mode/Speed combinations genuinely never self-oscillate on their own — that's faithful to the hardware this module is measured from, not a malfunction. Try a different Mode or Repeat Rate, or feed in a short transient to kick-start the loop rather than relying on Intensity alone from silence.
